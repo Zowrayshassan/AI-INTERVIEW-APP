@@ -1,11 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import Provider from "@/provider";
 import { motion } from "framer-motion";
 import { MoveRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 function Page() {
+  <Provider />;
   const [titleNumber, setTitleNumber] = useState(0);
   const titles = useMemo(
     () => [
