@@ -4,13 +4,16 @@ import { useUser } from "@/provider";
 import { BellIcon, Menu } from "lucide-react";
 import { useState } from "react";
 
-const Welcome = () => {
+const Welcome = ({ isSidebarOpen }) => {
   const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="bg-white w-full border rounded-2xl p-4 md:p-5 mt-3 sm:ml-20  md:ml-10 shadow-sm">
-      <div className="flex items-center justify-start gap-9  md:gap-50 lg:gap-70">
+    <div
+      className={`bg-white w-full border max-w-4xl rounded-2xl p-4 md:p-5 mt-3 shadow-sm transition-all duration-300
+      ${isSidebarOpen ? "sm:ml-20 md:ml-16" : "mx-auto"}`}
+    >
+      <div className="flex items-center justify-start gap-9">
         <div className="flex-1 min-w-0">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold truncate">
             Welcome, {user?.user_metadata?.name ?? "User"}

@@ -20,14 +20,13 @@ import {
 // Menu items
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
-  { title: "Scheduled Interview", url: "/scheduled", icon: Calendar },
+  { title: "Scheduled Interview", url: "/hello", icon: Calendar },
   { title: "All Interview", url: "/all-interviews", icon: Menu },
   { title: "Billing", url: "/billing", icon: Receipt },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
-  // 👇 you MUST call this hook here
   const pathname = usePathname();
 
   return (

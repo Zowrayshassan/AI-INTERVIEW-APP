@@ -17,13 +17,11 @@ const Provider = ({ children }) => {
     const currentUser = data.user;
 
     if (currentUser) {
-      // check if already in table
       const { data: rows } = await supabase
         .from("Users")
         .select("*")
         .eq("email", currentUser.email);
 
-      // if not, insert
       if (!rows || rows.length === 0) {
         await supabase.from("Users").insert([
           {

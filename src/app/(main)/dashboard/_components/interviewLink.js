@@ -72,7 +72,8 @@ const InterviewLink = ({ formData, interviewId }) => {
           Your AI Interview is Ready!
         </h1>
         <p className="text-gray-500 text-center mb-6 text-sm">
-          Share this link with your candidates to start the interview process
+          Share this link with your candidates to start the interview process or
+          Copy in new tab to start your interview
         </p>
 
         {/* Link Box */}

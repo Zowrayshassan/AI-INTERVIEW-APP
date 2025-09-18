@@ -1,8 +1,16 @@
 "use client";
+
 import { interviewDataContext } from "@/context/interviewData";
 import Vapi from "@vapi-ai/web";
 import { motion } from "framer-motion";
-import { Mic, Phone, Timer } from "lucide-react";
+import {
+  CheckCircle2,
+  Loader2,
+  Mic,
+  Phone,
+  Timer,
+  XCircle,
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -14,44 +22,37 @@ const InterviewStartPage = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [duration, setDuration] = useState(0);
   const [conversation, setConversation] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(null); // "success" | "error"
   const timerRef = useRef(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!interviewInfo) {
-      console.log("Interview info not ready yet...");
-      return;
-    }
-
-    console.log("this is the interview info final", interviewInfo);
-
-    const v = new Vapi(process.env.NEXT_PUBLIC_VAPI_KEY);
-
-    v.on("speech-start", () => setIsSpeaking(true));
-    v.on("speech-stop", () => setIsSpeaking(false));
-
-    setVapi(v);
-  }, [interviewInfo]);
+  const interviewId = interviewInfo?.interview?.id;
 
   const buildAssistantOptions = () => {
-    if (!interviewInfo) return null;
+    if (!interviewInfo) {
+      alert("Please entre your name and email before starting the interview");
+    }
 
     return {
       name: "AI Recruiter",
       firstMessage: `Hi ${
         interviewInfo.userName || "Candidate"
-      }, how are you ? Ready for your interview on ${
+      }, how are you? Ready for your interview on ${
         interviewInfo.interview?.jobPosition || "this role"
       }?`,
+
       transcriber: {
         provider: "deepgram",
         model: "nova-2",
         language: "en-US",
       },
+
       voice: {
         provider: "playht",
         voiceId: "jennifer",
       },
+
       model: {
         provider: "openai",
         model: "gpt-4",
@@ -59,84 +60,96 @@ const InterviewStartPage = () => {
           {
             role: "system",
             content: `
-  You are an AI voice assistant conducting interviews.
-  Your job is to ask candidates provided interview questions, assess their responses.
-  Begin the conversation with a friendly introduction, setting a relaxed yet professional tone.
-  
-  Ask one question at a time and wait for the candidate’s response before proceeding. 
-  Keep the questions clear and concise. Below are the questions to ask one by one:
-  
-  Questions: ${interviewInfo.interview?.questionList?.join("\n")}
-  
-  Provide brief, encouraging feedback after each answer.
-  
-  After ${
-    interviewInfo.interview?.duration || 15
-  } minutes, wrap up the interview smoothly.
-            `.trim(),
+You are an AI voice assistant conducting interviews.
+Your job is to ask candidates the provided interview questions and assess their responses.
+Begin with a friendly introduction, setting a relaxed yet professional tone.
+Ask one question at a time and wait for the candidate’s response before moving on.
+Keep questions clear and concise.
+
+Below are the questions to ask one by one:
+${interviewInfo.interview?.questionList?.join("\n")}
+
+Provide brief, encouraging feedback after each answer.
+After ${
+              interviewInfo.interview?.duration || 15
+            } minutes, wrap up the interview smoothly.
+          `.trim(),
           },
         ],
       },
     };
   };
 
+  // Initialize Vapi
+  useEffect(() => {
+    if (!interviewInfo) return;
+    const v = new Vapi(process.env.NEXT_PUBLIC_VAPI_KEY);
+    v.on("speech-start", () => setIsSpeaking(true));
+    v.on("speech-stop", () => setIsSpeaking(false));
+    setVapi(v);
+  }, [interviewInfo]);
+
   const startCall = () => {
     const options = buildAssistantOptions();
-    if (vapi && options) {
-      setIsRinging(true);
+    if (!vapi || !options) return;
+    setIsRinging(true);
+    vapi.start(options);
 
-      vapi.start(options);
-      console.log("Call started with options:", options);
+    vapi.on("speech-start", () => {
+      setIsRinging(false);
+      setIsSpeaking(true);
+    });
+    vapi.on("speech-stop", () => setIsSpeaking(false));
 
-      vapi.on("speech-start", () => {
-        setIsRinging(false);
-        setIsSpeaking(true);
-      });
+    vapi.on("message", (message) => {
+      if (message.type === "transcript" && message.transcriptType === "final") {
+        const text = message.transcript;
+        const role = message.role === "assistant" ? "assistant" : "candidate";
+        setConversation((prev) => [...prev, { role, text }]);
+      }
+    });
 
-      vapi.on("message", (message) => {
-        if (message.type === "transcript") {
-          setConversation((prev) => [
-            ...prev,
-            { role: message.role, text: message.transcript },
-          ]);
-        }
-      });
-
-      timerRef.current = setInterval(() => {
-        setDuration((prev) => prev + 1);
-      }, 1000);
-    }
+    timerRef.current = setInterval(() => setDuration((prev) => prev + 1), 1000);
   };
 
   const endCall = async () => {
-    if (vapi) {
-      vapi.stop();
-      console.log("Call ended");
-    }
+    if (vapi) vapi.stop();
     setIsRinging(false);
     setIsSpeaking(false);
     clearInterval(timerRef.current);
     setDuration(0);
+
+    if (!interviewId) return console.error("No interviewId to save.");
+
+    setIsSaving(true);
+    setSaveStatus(null);
+    const userEmail = interviewInfo.userEmail;
 
     try {
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          interviewId: interviewInfo?.interviewId,
-          conversation,
+          interviewId,
+          userEmail,
+          conversation: conversation.length
+            ? conversation
+            : [{ role: "system", text: "No conversation recorded." }],
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        console.log("Feedback saved:", data.feedback);
-        router.push(`/interview//${interviewInfo?.interviewId}/feedback`);
+        setSaveStatus("success");
+        setTimeout(() => router.push(`/dashboard`), 1500);
       } else {
-        console.error("Feedback save failed:", data.error);
+        setSaveStatus("error");
       }
     } catch (err) {
+      setSaveStatus("error");
       console.error("Error saving feedback:", err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -150,19 +163,30 @@ const InterviewStartPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col items-center">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6">
+        {/* Header */}
+        <motion.div
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center"
+        >
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4">
             AI Interview Session
           </h2>
-          <span className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
-            <Timer className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
-            {formatDuration(duration)}
+          <span className="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2">
+            <Timer className="w-6 h-6" /> {formatDuration(duration)}
           </span>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-2 gap-8 sm:gap-16 md:gap-32 lg:gap-60 w-full max-w-4xl h-auto mx-auto">
+        {/* Interviewer & Candidate */}
+        <div className="grid grid-cols-2 gap-12 max-w-4xl mx-auto mt-8">
           {/* Interviewer */}
-          <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 border rounded-lg bg-white shadow relative">
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center p-6 border rounded-lg bg-white shadow relative"
+          >
             <motion.div
               animate={
                 isRinging
@@ -183,51 +207,88 @@ const InterviewStartPage = () => {
             >
               <Image
                 src="/potrait.png"
-                alt="candidate"
-                className="rounded-full mb-3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover"
-                width={200}
-                height={300}
+                alt="interviewer"
+                className="rounded-full mb-3 w-20 h-20 object-cover"
+                width={80}
+                height={80}
               />
             </motion.div>
-            <p className="text-xs sm:text-sm md:text-base font-medium">
-              Interviewer
-            </p>
+            <p className="text-sm font-medium">Interviewer</p>
             {isRinging && (
               <p className="text-xs text-blue-500 mt-2 animate-pulse">
                 Ringing...
               </p>
             )}
-          </div>
+          </motion.div>
 
           {/* Candidate */}
-          <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 border rounded-lg bg-white shadow">
-            <div
-              className="flex items-center justify-center rounded-full bg-blue-600 text-white font-bold mb-3 
-                            w-16 h-16 text-xl sm:w-20 sm:h-20 sm:text-2xl md:w-24 md:h-24 md:text-3xl"
-            >
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center p-6 border rounded-lg bg-white shadow"
+          >
+            <div className="flex items-center justify-center rounded-full bg-blue-600 text-white font-bold mb-3 w-20 h-20 text-2xl">
               {interviewInfo?.userName?.charAt(0).toUpperCase() || "G"}
             </div>
-            <p className="text-xs sm:text-sm md:text-base font-medium">
+            <p className="text-sm font-medium">
               {interviewInfo?.userName || "Guest"}
             </p>
-          </div>
+          </motion.div>
         </div>
 
         {/* Controls */}
-        <div className="flex justify-center w-full sm:px-8 md:px-16 lg:px-32 mt-8 sm:mt-10 gap-6 sm:gap-12 md:gap-32 lg:gap-60">
-          <div className="flex justify-center w-1/2">
-            <Mic
-              onClick={startCall}
-              className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 p-2.5 sm:p-3 bg-gray-500 rounded-full cursor-pointer"
-            />
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-center gap-20 mt-10"
+        >
+          <Mic
+            onClick={startCall}
+            className="h-12 w-12 p-3 bg-gray-500 rounded-full cursor-pointer text-white hover:scale-105 transition"
+          />
+          <Phone
+            onClick={endCall}
+            className="h-12 w-12 p-3 bg-red-500 rounded-full cursor-pointer text-white hover:scale-105 transition"
+          />
+        </motion.div>
+
+        {/* Loader / Toast */}
+        {isSaving && (
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center gap-4"
+            >
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <p className="text-gray-700 font-medium">
+                Generating Feedback...
+              </p>
+            </motion.div>
           </div>
-          <div className="flex justify-center w-1/2">
-            <Phone
-              onClick={endCall}
-              className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 p-2.5 sm:p-3 bg-red-500 rounded-full cursor-pointer"
-            />
-          </div>
-        </div>
+        )}
+        {saveStatus === "success" && (
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="fixed bottom-6 right-6 bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg animate-bounce"
+          >
+            <CheckCircle2 className="h-5 w-5" /> Feedback Saved!
+          </motion.div>
+        )}
+        {saveStatus === "error" && (
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="fixed bottom-6 right-6 bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg animate-bounce"
+          >
+            <XCircle className="h-5 w-5" /> Error Saving Feedback
+          </motion.div>
+        )}
       </main>
     </div>
   );

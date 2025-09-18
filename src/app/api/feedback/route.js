@@ -8,12 +8,18 @@ const client = new OpenAI({
 
 export async function POST(req) {
   try {
-    const { interviewId, conversation } = await req.json();
+    const { interviewId, userEmail, conversation } = await req.json();
 
+    // Normalize conversation -> use transcript instead of text
     let formatted = "";
     conversation.forEach((msg) => {
-      formatted += `${msg.role === "assistant" ? "Q" : "A"}: ${msg.text}\n`;
+      const content = msg.text || msg.transcript || msg.output || "";
+      formatted += `${msg.role === "assistant" ? "Q" : "A"}: ${content}\n`;
     });
+
+    if (!formatted.trim()) {
+      throw new Error("Conversation was empty or not formatted correctly.");
+    }
 
     const prompt = `
     You are an experienced technical interviewer and career coach. 
@@ -63,6 +69,9 @@ export async function POST(req) {
     Technical Depth: X/10
     Confidence: X/10
     Overall Suitability: X/10
+
+
+    Final Recommendation Selected or Not Selected:
     `.trim();
 
     const completion = await client.chat.completions.create({
@@ -71,9 +80,12 @@ export async function POST(req) {
     });
 
     const feedback = completion.choices[0].message.content;
+
+    // ⚠️ Make sure interviewId is a number (not the UUID)
     const { error } = await supabase.from("interview_feedbacks").insert({
-      interview_id: interviewId,
+      interview_id: Number(interviewId), // ensure it's the int `id` (e.g. 31)
       transcript: conversation,
+      userEmail,
       feedback,
     });
 
