@@ -16,7 +16,7 @@ const Generatedquestions = ({
   const [loadingButton, setLoadingButton] = useState(false); // Loader for button
 
   async function saveInfo() {
-    setLoadingButton(true); // Start loader
+    setLoadingButton(true);
     const { data, error } = await supabase
       .from("interviews")
       .insert([
@@ -29,16 +29,15 @@ const Generatedquestions = ({
       ])
       .select();
 
-    setLoadingButton(false); // Stop loader after insert
+    setLoadingButton(false);
     if (error) {
       console.error("Error saving interview:", error);
     } else {
       console.log("Saved interview:", data);
-      progress(); // Proceed to next step
+      progress();
     }
   }
 
-  // Framer Motion variants for questions
   const containerVariants = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.1 } },
@@ -110,7 +109,6 @@ const Generatedquestions = ({
         </motion.div>
       )}
 
-      {/* Loader Dot Styles */}
       <style jsx>{`
         .dot {
           width: 10px;

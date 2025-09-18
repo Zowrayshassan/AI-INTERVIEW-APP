@@ -11,20 +11,26 @@ const AllInterviews = ({ isSidebarOpen }) => {
   const { user } = useUser();
 
   useEffect(() => {
-    user && getInterviews();
+    if (!user) return;
 
     const getInterviews = async () => {
+      console.log("Fetching interviews for:", user.email);
       let { data: interviews, error } = await supabase
         .from("interviews")
         .select("*")
-        .eq("userEmail", user?.email);
+        .eq("userEmail", user.email);
+
       if (error) {
         console.error("Error fetching interviews:", error);
       } else {
+        console.log("Interviews fetched:", interviews);
         setinterviewList(interviews);
       }
     };
+
+    getInterviews();
   }, [user]);
+  
 
   return (
     <div

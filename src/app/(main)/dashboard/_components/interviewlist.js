@@ -25,6 +25,7 @@ const Interviewlist = ({ isSidebarOpen }) => {
         setinterviewList(interviews);
       }
     };
+    getInterviews();
   }, [user]);
 
   return (

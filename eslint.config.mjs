@@ -21,7 +21,7 @@ const eslintConfig = [
     ],
     languageOptions: {
       parserOptions: {
-        project: "./tsconfig.json", // optional, only if using TS
+        project: "./tsconfig.json", 
       },
       parser: "@typescript-eslint/parser",
       plugins: {

@@ -48,7 +48,6 @@ const InterviewPage = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col sm:px-3 md:px-[7%] py-6">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -62,7 +61,6 @@ const InterviewPage = () => {
         <span>Create New Interview</span>
       </motion.div>
 
-      {/* Progress bar */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -72,7 +70,6 @@ const InterviewPage = () => {
         <Progress value={step * 33} className="w-full" />
       </motion.div>
 
-      {/* Steps */}
       <div className="w-full max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
           {step === 1 && (
@@ -125,4 +122,3 @@ const InterviewPage = () => {
 };
 
 export default InterviewPage;
-  

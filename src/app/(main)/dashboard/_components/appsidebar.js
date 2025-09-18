@@ -17,7 +17,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Menu items
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Scheduled Interview", url: "/hello", icon: Calendar },
@@ -35,7 +34,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>
             <Image
-              src="/logo.png"
+              src="/LOGO.png"
               width={900}
               height={500}
               alt="logo"

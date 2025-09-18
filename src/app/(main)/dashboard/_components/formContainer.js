@@ -10,23 +10,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const FormInterview = ({ formData, onHandleChange, progress }) => {
-  // local state for selected interview types
   const [selectedTypes, setSelectedTypes] = useState([]);
 
-  useEffect(() => {
-    onHandleChange("interviewType", selectedTypes);
-  }, [selectedTypes, onHandleChange]);
-
   const toggleType = (type) => {
-    setSelectedTypes(
-      (prev) =>
-        prev.includes(type)
-          ? prev.filter((t) => t !== type) // remove if already selected
-          : [...prev, type] // add if not selected
-    );
+    const updatedTypes = selectedTypes.includes(type)
+      ? selectedTypes.filter((t) => t !== type)
+      : [...selectedTypes, type];
+
+    setSelectedTypes(updatedTypes);
+    onHandleChange("interviewType", updatedTypes); // update parent directly
   };
 
   return (
@@ -52,10 +47,14 @@ const FormInterview = ({ formData, onHandleChange, progress }) => {
           />
         </div>
 
-        {/* Interview Duration */}
         <div className="flex flex-col gap-2">
           <label className="font-medium">Interview Duration</label>
-          <Select onValueChange={(value) => onHandleChange("duration", value)}>
+          <Select
+            onValueChange={
+              (value) =>
+                formData.duration !== value && onHandleChange("duration", value) // prevent unnecessary updates
+            }
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Minutes" />
             </SelectTrigger>
@@ -69,7 +68,6 @@ const FormInterview = ({ formData, onHandleChange, progress }) => {
           </Select>
         </div>
 
-        {/* Interview Types */}
         <div>
           {interviewType.map((interview, idx) => (
             <div

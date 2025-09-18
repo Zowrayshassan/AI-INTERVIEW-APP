@@ -60,14 +60,12 @@ const InterviewLink = ({ formData, interviewId }) => {
   return (
     <div className="flex items-center min-h-5 px-4 lg:justify-start lg:ml-36 lg:min-h-screen">
       <div className="bg-white shadow-md rounded-lg p-6 sm:p-8 w-full lg:w-[600px] max-w-xl">
-        {/* Success icon */}
         <div className="flex justify-center mb-4">
           <div className="bg-green-500 rounded-full p-3">
             <Image src="/tick.png" alt="success" width={36} height={36} />
           </div>
         </div>
 
-        {/* Heading */}
         <h1 className="text-lg sm:text-xl font-semibold text-center mb-1">
           Your AI Interview is Ready!
         </h1>
@@ -76,7 +74,6 @@ const InterviewLink = ({ formData, interviewId }) => {
           Copy in new tab to start your interview
         </p>
 
-        {/* Link Box */}
         <div className="border rounded-lg p-4 mb-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
             <span className="text-sm font-medium text-gray-600">
@@ -97,7 +94,6 @@ const InterviewLink = ({ formData, interviewId }) => {
           </div>
         </div>
 
-        {/* Info Row */}
         <div className="flex flex-col sm:flex-row flex-wrap justify-start gap-3 sm:gap-8 text-gray-600 text-sm mb-6 pl-1">
           <div className="flex items-center gap-1">
             <Clock size={16} className="text-gray-500" /> {duration}
@@ -112,7 +108,6 @@ const InterviewLink = ({ formData, interviewId }) => {
           </div>
         </div>
 
-        {/* Share via */}
         <h2 className="text-gray-700 mb-3 font-medium text-sm pl-1">
           Share via
         </h2>
@@ -143,7 +138,6 @@ const InterviewLink = ({ formData, interviewId }) => {
           </button>
         </div>
 
-        {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <Link href="/dashboard">
             <button className="px-4 py-2 text-sm border border-gray-400 rounded-lg hover:bg-gray-100 transition">

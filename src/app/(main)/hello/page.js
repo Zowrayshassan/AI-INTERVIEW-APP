@@ -36,6 +36,7 @@ const ScheduleInterviews = ({ isSidebarOpen }) => {
         setFeedbackList(data);
       }
     };
+    getFeedbacks();
   }, [user]);
 
   return (

@@ -33,11 +33,10 @@ const Options = () => {
   );
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-4 py-8">
       <h1 className="font-bold text-xl mb-6 ml-2"></h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {/* Create Interview */}
         <Link
           href={"/dashboard/interviewpage"}
           onClick={() => handleClick("interview")}
@@ -62,7 +61,6 @@ const Options = () => {
           </motion.div>
         </Link>
 
-        {/* Phone Call */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
