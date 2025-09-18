@@ -25,35 +25,33 @@ export default function CandidateReport() {
 
   useEffect(() => {
     if (interviewId && feedbackId) {
-      fetchData();
+      const fetchData = async () => {
+        setLoading(true);
+
+        const { data: interviewData } = await supabase
+          .from("interviews")
+          .select("id, jobTitle, jobPosition, duration")
+          .eq("id", interviewId)
+          .single();
+
+        const { data: feedbackData } = await supabase
+          .from("interview_feedbacks")
+          .select("id, feedback, created_at")
+          .eq("id", feedbackId)
+          .single();
+
+        if (!interviewData || !feedbackData) {
+          setLoading(false);
+          return;
+        }
+
+        setInterview(interviewData);
+        setFeedback(feedbackData);
+        setParsedData(parseFeedback(feedbackData.feedback));
+        setLoading(false);
+      };
     }
   }, [interviewId, feedbackId]);
-
-  const fetchData = async () => {
-    setLoading(true);
-
-    const { data: interviewData } = await supabase
-      .from("interviews")
-      .select("id, jobTitle, jobPosition, duration")
-      .eq("id", interviewId)
-      .single();
-
-    const { data: feedbackData } = await supabase
-      .from("interview_feedbacks")
-      .select("id, feedback, created_at")
-      .eq("id", feedbackId)
-      .single();
-
-    if (!interviewData || !feedbackData) {
-      setLoading(false);
-      return;
-    }
-
-    setInterview(interviewData);
-    setFeedback(feedbackData);
-    setParsedData(parseFeedback(feedbackData.feedback));
-    setLoading(false);
-  };
 
   // Improved feedback parser
   const parseFeedback = (text) => {

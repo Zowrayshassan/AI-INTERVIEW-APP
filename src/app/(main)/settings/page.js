@@ -1,9 +1,9 @@
-import React from 'react'
-
 const page = () => {
   return (
-    <div>page</div>
-  )
-}
+    <div className="font-bold text-center text-gray-500 m-10">
+      Working on it enjoy for now !!
+    </div>
+  );
+};
 
-export default page
+export default page;

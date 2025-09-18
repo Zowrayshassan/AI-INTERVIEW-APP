@@ -1,6 +1,6 @@
+import { FlatCompat } from "@eslint/eslintrc";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,6 +19,18 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.json", // optional, only if using TS
+      },
+      parser: "@typescript-eslint/parser",
+      plugins: {
+        "@typescript-eslint": require("@typescript-eslint/eslint-plugin"),
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off", // disable the rule
+    },
   },
 ];
 

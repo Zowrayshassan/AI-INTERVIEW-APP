@@ -11,34 +11,32 @@ const ScheduleInterviews = ({ isSidebarOpen }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (user) getFeedbacks();
-  }, [user]);
-
-  const getFeedbacks = async () => {
-    const { data, error } = await supabase
-      .from("interviews")
-      .select(
-        `
-        id,
-        jobTitle,
-        jobPosition,
-        duration,
-        interview_feedbacks:interview_feedbacks_interview_id_fkey (
+    const getFeedbacks = async () => {
+      const { data, error } = await supabase
+        .from("interviews")
+        .select(
+          `
           id,
-          feedback,
-          created_at
+          jobTitle,
+          jobPosition,
+          duration,
+          interview_feedbacks:interview_feedbacks_interview_id_fkey (
+            id,
+            feedback,
+            created_at
+          )
+        `
         )
-      `
-      )
-      .eq("userEmail", user?.email)
-      .order("created_at", { ascending: false });
+        .eq("userEmail", user?.email)
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching feedbacks:", error);
-    } else {
-      setFeedbackList(data);
-    }
-  };
+      if (error) {
+        console.error("Error fetching feedbacks:", error);
+      } else {
+        setFeedbackList(data);
+      }
+    };
+  }, [user]);
 
   return (
     <div className="px-6 py-10 min-h-screen">

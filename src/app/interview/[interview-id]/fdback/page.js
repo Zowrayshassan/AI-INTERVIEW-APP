@@ -10,14 +10,11 @@ const InterviewDetail = () => {
   const [interview, setInterview] = useState(null);
 
   useEffect(() => {
-    if (id) fetchInterview();
-  }, [id]);
-
-  const fetchInterview = async () => {
-    const { data, error } = await supabase
-      .from("interviews")
-      .select(
-        `
+    const fetchInterview = async () => {
+      const { data, error } = await supabase
+        .from("interviews")
+        .select(
+          `
         id,
         jobTitle,
         jobPosition,
@@ -31,17 +28,20 @@ const InterviewDetail = () => {
           userEmail
         )
       `
-      )
-      .eq("id", id)
-      .single();
+        )
+        .eq("id", id)
+        .single();
 
-    if (!error) setInterview(data);
-  };
+      if (!error) setInterview(data);
+    };
+
+    if (id) fetchInterview();
+  }, [id]);
 
   if (!interview)
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading interview...
+      <div className="flex items-center justify-center text-gray-500">
+        Loading Feedback...
       </div>
     );
 
@@ -53,17 +53,15 @@ const InterviewDetail = () => {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {interview.jobPosition}
         </h1>
+        <p className="font-bold m-5">Job Description</p>
         <p className="text-gray-600 mb-6">{interview.jobTitle}</p>
-
         <p className="text-sm text-gray-500 mb-4">
           ⏱ Duration: {interview.duration} minutes
         </p>
         <p className="text-sm text-gray-400 mb-8">
           Created: {new Date(interview.created_at).toLocaleDateString()}
         </p>
-
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Candidates</h2>
-
         {feedbacks.length > 0 ? (
           <ul className="divide-y divide-gray-200 rounded-lg border">
             {feedbacks.map((fb) => (

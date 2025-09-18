@@ -67,7 +67,7 @@ const Generatedquestions = ({
             <span className="dot animate-bounce delay-400"></span>
             <span className="dot animate-bounce delay-600"></span>
           </div>
-          <p className="mt-4 text-gray-600 animate-pulse">
+          <p className="mt-4 text-gray-600 mx-auto animate-pulse">
             ⏳ Generating questions...
           </p>
         </div>

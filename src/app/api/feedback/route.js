@@ -81,9 +81,9 @@ export async function POST(req) {
 
     const feedback = completion.choices[0].message.content;
 
-    // ⚠️ Make sure interviewId is a number (not the UUID)
+
     const { error } = await supabase.from("interview_feedbacks").insert({
-      interview_id: Number(interviewId), // ensure it's the int `id` (e.g. 31)
+      interview_id: Number(interviewId), 
       transcript: conversation,
       userEmail,
       feedback,

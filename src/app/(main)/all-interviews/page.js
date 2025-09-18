@@ -12,19 +12,19 @@ const AllInterviews = ({ isSidebarOpen }) => {
 
   useEffect(() => {
     user && getInterviews();
-  }, [user]);
 
-  const getInterviews = async () => {
-    let { data: interviews, error } = await supabase
-      .from("interviews")
-      .select("*")
-      .eq("userEmail", user?.email);
-    if (error) {
-      console.error("Error fetching interviews:", error);
-    } else {
-      setinterviewList(interviews);
-    }
-  };
+    const getInterviews = async () => {
+      let { data: interviews, error } = await supabase
+        .from("interviews")
+        .select("*")
+        .eq("userEmail", user?.email);
+      if (error) {
+        console.error("Error fetching interviews:", error);
+      } else {
+        setinterviewList(interviews);
+      }
+    };
+  }, [user]);
 
   return (
     <div

@@ -16,10 +16,9 @@ const FormInterview = ({ formData, onHandleChange, progress }) => {
   // local state for selected interview types
   const [selectedTypes, setSelectedTypes] = useState([]);
 
-  // whenever selectedTypes changes, update parent formData
   useEffect(() => {
     onHandleChange("interviewType", selectedTypes);
-  }, [selectedTypes]);
+  }, [selectedTypes, onHandleChange]);
 
   const toggleType = (type) => {
     setSelectedTypes(
@@ -31,7 +30,7 @@ const FormInterview = ({ formData, onHandleChange, progress }) => {
   };
 
   return (
-    <div className="sm:w-full md:w-100 lg:w-150 justify-center">
+    <div className="sm:w-full md:w-100 lg:w-150 justify-center ">
       <div className="w-full bg-white border mx-auto rounded-lg flex flex-col gap-6 p-5">
         <div className="flex flex-col gap-2">
           <label className="font-medium">Job Position</label>

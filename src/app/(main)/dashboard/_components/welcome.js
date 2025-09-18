@@ -10,10 +10,13 @@ const Welcome = ({ isSidebarOpen }) => {
 
   return (
     <div
-      className={`bg-white w-full border max-w-4xl rounded-2xl p-4 md:p-5 mt-3 shadow-sm transition-all duration-300
-      ${isSidebarOpen ? "sm:ml-20 md:ml-16" : "mx-auto"}`}
+      className={`
+          bg-white w-full max-w-4xl lg:ml-8  border rounded-2xl p-4 md:p-5 mt-3 shadow-sm
+          transition-all duration-300
+          
+        `}
     >
-      <div className="flex items-center justify-start gap-9">
+      <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold truncate">
             Welcome, {user?.user_metadata?.name ?? "User"}
