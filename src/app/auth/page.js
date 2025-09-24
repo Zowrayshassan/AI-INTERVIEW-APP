@@ -19,7 +19,6 @@ const LoginPage = () => {
         },
       },
     });
-    
 
     if (error) {
       console.log("Google Login Error:", error.message);
