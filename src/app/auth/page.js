@@ -13,7 +13,7 @@ const LoginPage = () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:3000/dashboard",
+        redirectTo: "NEXT_PUBLIC_BASE_URL/dashboard",
         queryParams: {
           prompt: "select_account",
         },
