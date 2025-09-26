@@ -29,13 +29,18 @@ const LoginPage = () => {
     try {
       console.log("Site URL:", process.env.NEXT_PUBLIC_SITE_URL); // Debug log
       console.log("hi how are u ?");
+      const siteUrl = (
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        "https://ai-interview-app-sjt2.vercel.app"
+      )
+        .trim()
+        .replace(/\/$/, ""); // removes trailing slash if any
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
-          queryParams: {
-            prompt: "select_account",
-          },
+          redirectTo: `${siteUrl}/dashboard`,
+          queryParams: { prompt: "select_account" },
         },
       });
 
