@@ -5,7 +5,7 @@ import { supabase } from "./lib/supbaseClient";
 
 const Provider = ({ children }) => {
   const [user, setUser] = useState(null);
-  // check supabase auth + add to table
+
   const syncUser = async () => {
     const { data, error } = await supabase.auth.getUser();
 
@@ -54,5 +54,5 @@ export default Provider;
 
 export const useUser = () => {
   const context = useContext(userContext);
-  return context; // returns { user, setUser }
+  return context;
 };

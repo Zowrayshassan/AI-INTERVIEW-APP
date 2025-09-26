@@ -3,25 +3,48 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supbaseClient";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      console.log("hiiiii");
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        router.push("/dashboard");
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const signInWithGoogle = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
-        queryParams: {
-          prompt: "select_account",
-        },
-      },
-    });
+    setError(null);
 
-    if (error) {
-      console.log("Google Login Error:", error.message);
+    try {
+      console.log("Site URL:", process.env.NEXT_PUBLIC_SITE_URL); // Debug log
+      console.log("hi how are u ?");
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
+          queryParams: {
+            prompt: "select_account",
+          },
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (err) {
+      console.error("Google Login Error:", err.message);
+      setError("Failed to sign in. Please try again.");
       setLoading(false);
     }
   };
@@ -41,6 +64,7 @@ const LoginPage = () => {
           width={550}
           height={200}
           className="border shadow-2xl"
+          priority
         />
       </motion.div>
 
@@ -54,7 +78,22 @@ const LoginPage = () => {
         Welcome to AI-Powered Interview App
       </motion.h3>
 
-      {/* Google Login Button */}
+      {/* Debug Info - Remove after testing */}
+      <div className="mb-4 p-2 bg-gray-100 rounded text-sm">
+        <p>Debug: SITE_URL = {process.env.NEXT_PUBLIC_SITE_URL}</p>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded max-w-lg w-full text-center"
+        >
+          {error}
+        </motion.div>
+      )}
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
