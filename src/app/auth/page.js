@@ -39,7 +39,7 @@ const LoginPage = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${siteUrl}/dashboard`,
+          redirectTo: `https://ai-interview-app-sjt2.vercel.app/dashboard`,
           queryParams: { prompt: "select_account" },
         },
       });
@@ -56,7 +56,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex flex-col items-center mt-20 px-4">
-      {/* Logo */}
+      
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { supabase } from "@/lib/supabaseClient"; // Make sure path is correct
+import { supabase } from "@/lib/supbaseClient";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Interviewlist from "./_components/interviewlist";
