@@ -56,7 +56,6 @@ const LoginPage = () => {
 
   return (
     <div className="flex flex-col items-center mt-20 px-4">
-      
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -84,9 +83,7 @@ const LoginPage = () => {
       </motion.h3>
 
       {/* Debug Info - Remove after testing */}
-      <div className="mb-4 p-2 bg-gray-100 rounded text-sm">
-        <p>Debug: SITE_URL = {process.env.NEXT_PUBLIC_SITE_URL}</p>
-      </div>
+      <div className="mb-4 p-2 bg-gray-100 rounded text-sm"></div>
 
       {/* Error Message */}
       {error && (
