@@ -82,10 +82,9 @@ const LoginPage = () => {
         Welcome to AI-Powered Interview App
       </motion.h3>
 
-      {/* Debug Info - Remove after testing */}
       <div className="mb-4 p-2 bg-gray-100 rounded text-sm"></div>
 
-      {/* Error Message */}
+    
       {error && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

@@ -13,28 +13,36 @@ const Generatedquestions = ({
   interviewId,
 }) => {
   const { user } = useUser();
-  const [loadingButton, setLoadingButton] = useState(false); // Loader for button
+  const [loadingButton, setLoadingButton] = useState(false);
 
   async function saveInfo() {
-    setLoadingButton(true);
-    const { data, error } = await supabase
-      .from("interviews")
-      .insert([
-        {
-          ...formData,
-          userEmail: user?.email,
-          interviewID: interviewId,
-          questionList: questions,
-        },
-      ])
-      .select();
+    try {
+      setLoadingButton(true);
 
-    setLoadingButton(false);
-    if (error) {
-      console.error("Error saving interview:", error);
-    } else {
-      console.log("Saved interview:", data);
-      progress();
+      const { data, error } = await supabase
+        .from("interviews")
+        .insert([
+          {
+            ...formData,
+            userEmail: user?.email,
+            interviewID: interviewId,
+            questionList: questions,
+          },
+        ])
+        .select();
+
+      if (error) {
+        console.error("Error saving interview:", error);
+        alert("Failed to save interview. Please try again.");
+      } else {
+        console.log("Saved interview:", data);
+        progress();
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoadingButton(false);
     }
   }
 
@@ -93,7 +101,8 @@ const Generatedquestions = ({
           <Button
             onClick={saveInfo}
             disabled={loadingButton}
-            className="flex justify-center items-center gap-2"
+            className="flex justify-center items-center gap-2 min-h-[44px] touch-manipulation"
+            type="button"
           >
             {loadingButton ? (
               <div className="flex space-x-1">
