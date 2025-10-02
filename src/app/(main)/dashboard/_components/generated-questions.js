@@ -16,9 +16,11 @@ const Generatedquestions = ({
   const [loadingButton, setLoadingButton] = useState(false);
 
   async function saveInfo() {
-    try {
-      setLoadingButton(true);
+    if (loadingButton) return;
 
+    setLoadingButton(true);
+
+    try {
       const { data, error } = await supabase
         .from("interviews")
         .insert([
@@ -33,14 +35,12 @@ const Generatedquestions = ({
 
       if (error) {
         console.error("Error saving interview:", error);
-        alert("Failed to save interview. Please try again.");
       } else {
         console.log("Saved interview:", data);
         progress();
       }
     } catch (err) {
       console.error("Unexpected error:", err);
-      alert("An unexpected error occurred. Please try again.");
     } finally {
       setLoadingButton(false);
     }
@@ -101,8 +101,9 @@ const Generatedquestions = ({
           <Button
             onClick={saveInfo}
             disabled={loadingButton}
-            className="flex justify-center items-center gap-2 min-h-[44px] touch-manipulation"
             type="button"
+            className="flex justify-center items-center gap-2 touch-manipulation"
+            style={{ minHeight: "44px" }}
           >
             {loadingButton ? (
               <div className="flex space-x-1">
